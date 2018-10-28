@@ -18,7 +18,7 @@ big-O는 알고리즘의 효율성을 나타내는 지표 혹은 언어이다
 - n개의 1차원 배열: O(N)
 - n개의 2차원 배열: O(N^2)
 스택 또한 공간복잡도 계산에 포함
-```
+```java
 int sum(int n) {
     if (n <= 0) {
         return 0;
@@ -33,8 +33,8 @@ sum(4)
         -> sum(0)
 ```
 단지 n번 호출됐다고 해서 O(N) 공간을 사용한다고 말할 수 없다.
-```
-inf pairSumSequence(int n) {
+```java
+int pairSumSequence(int n) {
     int sum = 0;
     for (int i = 0; i < n; i++) {
         sum += pairSum(i, i + 1);
@@ -49,7 +49,7 @@ int pairSum(int a, int b) {
 함수는 n번 호출됐지만 스택에는 동시에 존재하지 않으므로 O(1)
 
 ## 상수항은 무시하라
-```
+```java
 // 최소와 최대 1
 int min = Integer.MAX_VALUE;
 int max = Integer.MIN_VALUE;
@@ -77,16 +77,19 @@ for (int x : array) {
 
 ## 지배적이지 않은 항은 무시하라
 수식에서 차수가 낮은 항은 무시해도 된다.
-- O(N^2 + N) => O(N^2)
-- O(N + logN) => O(N)
-- O(5*2^N + 1000N^100) => O(2^N)
+```
+O(N^2 + N) => O(N^2)
+O(N + logN) => O(N)
+O(5*2^N + 1000N^100) => O(2^N)
+```
 
 크기 비교
-- O(N!) > O(2^N) > O(N^2) > O(NlogN) > O(N) > O(logN) > O(1)
-
+```
+O(N!) > O(2^N) > O(N^2) > O(NlogN) > O(N) > O(logN) > O(1)
+```
 ## 여러 부분으로 이루어진 알고리즘: 덧셈 vs 곱셈
 덧셈 수행 시간: O(A+B)
-```
+```java
 for (int a : arrA) {
     print(a);
 }
@@ -94,8 +97,10 @@ for (int b : arrB) {
     print(b);
 }
 ```
+
 곱셈 수행 시간: O(A*B)
-```
+
+```java
 for (int a : arrA) {
     for (int b : arrB) {
         print(a + "," + b);
@@ -151,17 +156,20 @@ N = 8
 N = 16
 ```
 즉 2^k = N을 만족하는 k는 무엇인가?
+
 ```
 2^4 = 16 -> log2 16 = 4
 log2 N = k -> 2^k = N
 ```
+
 결론적으로 수행시간은 O(logN) 이다.
 
 또한, big-O에서는 로그의 밑을 고려할 필요가 없다고 보면 된다.
 
 ## 재귀적으로 수행시간 구하기
 이 피보나치 수열을 보자.
-```
+
+```java
 int f(int n) {
     if (n <= 1) {
         return 1;
@@ -182,11 +190,17 @@ int f(int n) {
 4|16|2 * 8|2^4
 
 전체 노드의 개수
-- 2^0 + 2^1 + 2^2 + 2^3 + ... + 2^N
-- => 2^(N+1) - 1
+```
+2^0 + 2^1 + 2^2 + 2^3 + ... + 2^N
+  => 2^(N+1) - 1
+```
 결론
-- O(2^N)
+```
+O(2^N)
+```
 
 big-O에서 지수의 밑은 무시하면 안된다
-- 8^n => (2^3)^n => 2^3n => 2^2n*2^n
+```
+8^n => (2^3)^n => 2^3n => 2^2n*2^n
+```
 
