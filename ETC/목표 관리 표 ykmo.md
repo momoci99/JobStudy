@@ -28,7 +28,7 @@
   </tr>
   <tr>
     <td>기본</td>
-    <td>React와 그 주변 라이브러리를 이용하여 날씨 사이트를 만든다.</td>
+    <td>React를 활용한 토이 프로젝트 진행</td>
     <td></td>
   </tr>
   <tr>
@@ -77,27 +77,27 @@
   </tr>
   <tr>
     <td>5단계(최고)</td>
-    <td></td>
+    <td>React를 이용한 토이프로젝트 진행</td>
     <td>도전적인</td>
   </tr>
   <tr>
     <td>4단계(상위)</td>
-    <td></td>
+    <td>mongoDB를 사용하여 연동한다</td>
     <td></td>
   </tr>
   <tr>
     <td>3단계(중위)</td>
-    <td></td>
+    <td>Node.js , Koa, React를 연동한다.</td>
     <td>수행가능한</td>
   </tr>
   <tr>
     <td>2단계(하위)</td>
-    <td></td>
+    <td>Redux를 왜 사용하는지, 어떻게 사용하는지 익한다.</td>
     <td></td>
   </tr>
   <tr>
     <td>1단계(최하)</td>
-    <td>React 기초 서적 1권과 TypeScript 기초 서적 1권을 익혔다.</td>
+    <td>React에 대한 기본적인 요소 - JSX, 컴포넌트, 이벤트 핸들링에 대해 공부한다.</td>
     <td>최소한 해야 할것</td>
   </tr>
   <tr>
