@@ -199,12 +199,55 @@ boolean checkBST(TreeNode n, Integer min, Integer max){
 
 
 ####  4.7 순서정하기 : 프로젝트의 리스트와 프로젝트들 간의 종속 관계(즉, 프로젝트 쌍이 리스트로 주어지면 각 프로젝트 쌍에서 두 번째 프로젝트가 첫 번째 프로젝트에 종속되어 있다는 뜻)가 주어졌을 때, 프로젝트를 수행해 나가는 순서를 찾으라. 유효한 순서가 존재하지 않으면 에러를 반환한다.
-???????????????????????
+
 
 
 
 
 #### 4.9 BST 수열 : 배열의 원소를 왼쪽에서부터 차례로 트리에 삽입함으로써 이진 탐색 트리를 생성할 수 있다. 이진 탐색 트리 안에서 원소가 중복되지 않는다고 할 때, 해당 트리를 만들어 낼 수 있는 모든 가능한 배열을 출력하라.
+
+> 예제를 사용하여 푸는것이 현명 - 책 참고
+
+1. 배열의 첫번째 요소는 루트 노드가 된다.
+2. 루트 원소가 삽입된 이후의 자식노드들은 왼쪽, 오른쪽 삽입 순서와 상관없이 이진탐색트리의 규칙인 '왼쪽노드 value < 현재노드 value < 오른쪽 노드 value를 지키며 삽입된다. 즉 누가먼저 삽입되던 상관없다는 뜻이다.
+
+
+```java
+ArrayList<LinkedList<Integer>> allSequences(TreeNode node){
+    ArrayList<LinkedList<Integer>> result = new ArrayList();
+
+    if(node == null){
+        result.add(new LinkedList());
+        return result;
+    }
+
+    LinkedList<Integer> prefix = new LinkedList();
+    prefix.add(node.data);
+
+    //왼쪽과 오른쪽 부분 트리에 대한 재귀
+    ArrayList<LinkedList<Integer>> leftSeq = allSequences(node.left);
+    ArrayList<LinkedList<Integer>> rightSeq = allSequences(node.right);
+
+    //왼쪽과 오른쪽 결과 리스트를 엮어 하나로 만들기
+    for(LinkedList left:leftSeq){
+        for(LinkedList righ : rightSeq){
+            ArrayList<LinkedList<Integer>> weaved = 
+                new ArrayList<LinkedList<Integer>>();
+            weaveLists(left, right, weaved, prefix);
+            result.addAll(weaved);
+        }
+    }
+    return result;
+}
+
+
+
+
+
+
+```
+
+
 
 
 
