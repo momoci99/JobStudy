@@ -6,4 +6,4 @@
 
 - [Jungeol](https://github.com/Jungeol)
 - [momoci99](https://github.com/momoci99)
-- [ctk03272](https://github.com/ctk03272)
+- ~~[ctk03272](https://github.com/ctk03272)~~
