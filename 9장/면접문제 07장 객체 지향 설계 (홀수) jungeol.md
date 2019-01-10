@@ -502,5 +502,200 @@ enum RequestStatus {
 ## 7.9 순환 배열:
 CurcularArray 클래스를 구현하라. 이 클래스는 배열과 비슷한 자료구조이지만 효과적으로 순환(rotate)이 가능해야한다. 클래스는 가능한 제네릭타입(generic type) 혹은 템플릿(template)으로 구현하는게 좋고, for (obj o : circularArray)와 같이 표준 표기법으로 순회(iterate)가 가능해야한다.
 
+CurcularArray를 구현하는 부분과 iteration을 지원해야하는 부분 2가지로 나눠서 생각해야함
+### CircularArrayClass 구현
+
+일반 배열로 CircularArray를 구현하는 방법:
+
+1. rotate를 호출할때마다 실제 원소를 시프트 하는 방법
+2. rotate를 호출할때마다 head를 이동하는 방법
+
+2번이 효율적
+
+```typescript
+class circularArray<T> {
+    private items: Array<T>;
+    private head: number = 0;
+
+    constructor(size: number) {
+        this.items = new Array<T>(size);
+    }
+
+    private convert(index: number): number {
+        if (index < 0) {
+            index += this.items.length;
+        }
+        return (this.head + index) % this.items.length;
+    }
+
+    public rotate(shiftRight: number): void {
+        this.head = this.convert(shiftRight);
+    }
+
+    public get(i: number): T {
+        if (i < 0 || i >= this.items.length) {
+            throw new Error("...");
+        }
+        return this.items[this.convert(i)];
+    }
+
+    public set(i: number, item: T) {
+        this.items[this.convert(i)] = item;
+    }
+}
+```
+### iterator 구현하기
+
+```typescript
+class circularArray<T> {
+    private items: Array<T>;
+    private head: number = 0;
+
+    private pointer: number = 0;
+
+    constructor(size: number) {
+        this.items = new Array<T>(size);
+    }
+
+    public next(): { value: T, done: boolean }{
+        if (this.pointer >= this.items.length) {
+            return { value: null, done: true };
+        }
+        const last = this.convert(this.head - 1);
+        const curr = this.convert(this.pointer);
+        this.pointer += 1;
+        return {
+            done: last === curr,
+            value: this.items[curr]
+        };
+    }
+
+    private convert(index: number): number {
+        if (index < 0) {
+            index += this.items.length;
+        }
+        return (this.head + index) % this.items.length;
+    }
+
+    public rotate(shiftRight: number): void {
+        this.head = this.convert(shiftRight);
+    }
+
+    public get(i: number): T {
+        if (i < 0 || i >= this.items.length) {
+            throw new Error("...");
+        }
+        return this.items[this.convert(i)];
+    }
+
+    public set(i: number, item: T) {
+        this.items[this.convert(i)] = item;
+    }
+}
+```
+
 ## 7.11 파일 시스템:
 메모리 상주형 파일 시스템(in-memory file system)을 구현하기 위한 자료구조와 알고리즘에 대해 설명해 보라. 가능하면 코드 예제를 들어 설명하라.
+
+- 많은 지원자들이 너무 저수준이라 당황할 수 있는 문제
+- 파일 시스템을 구성하는 컴포넌트에 대해 생각해보면 공략가능
+1. 단순하게 File과 Directory로 구성
+2. Directory안에는 File과 Directory의 집합이 들어있음
+3. 공통속성이 많으므로 Entry로 구분
+
+```typescript
+namespace MyFileSystem {
+    export abstract class Entry {
+        protected parent: Directory;
+        protected created: number;
+        protected lastUpdated: number;
+        protected lastAccessed: number;
+        protected name: String;
+    
+        constructor(n: String, p: Directory) {
+            this.name = n;
+            this.parent = p;
+            this.created = (new Date()).getMilliseconds();
+            this.lastUpdated = (new Date()).getMilliseconds();
+            this.lastAccessed = (new Date()).getMilliseconds();
+        }
+
+        public delete(): boolean {
+            if (parent == null) return false;
+            else return this.parent.deleteEntry(this);
+        }
+
+        public abstract getSize(): number;
+
+        public getFullPath(): String {
+            if (parent == null) return this.name;
+            else return this.parent.getFullPath() + "/" + this.name;
+        }
+
+        /* getter setter */
+        public getCreationTime(): number { return this.created; }
+        public getLastUpadateTime(): number { return this.lastUpdated; }
+        public getLastAccessedTime(): number { return this.lastAccessed; }
+        public changeName(name: String): void { this.name = name; }
+        public getName(): String { return this.name; }
+    }
+    
+    export class File extends Entry{
+        protected content: String;
+        protected size: number;
+
+        constructor(name: String, p: Directory, size: number) {
+            super(name, p);
+            this.size = size;
+        }
+
+        public getSize(): number { return this.size; }
+        public getContent(): String { return this.content; }
+        public setContent(c: String): void { this.content = c; }
+    }
+
+    export class Directory extends Entry {
+        protected contents: Array<Entry> = [];
+
+        constructor(n: String, p: Directory) {
+            super(n, p);
+        }
+
+        public getSize(): number {
+            let size = 0;
+            for (let e of this.contents) {
+                size += e.getSize();
+            }
+            return size;
+        }
+
+        public numberOfFiles(): number {
+            let count = 0;
+            for (let e of this.contents) {
+                if (e instanceof Directory) {
+                    count++;
+                    count += e.numberOfFiles();
+                } else {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        public deleteEntry(entry: Entry): boolean {
+            let idx = null;
+            for (let i in this.contents) {
+                if (this.contents[i] === entry) {
+                    idx = i;
+                    break;
+                }
+            }
+            if (idx !== null) {
+                this.contents.splice(idx, 1);
+            }
+            return idx !== null;
+        }
+        public getContents(): Array<Entry> { return this.contents; }
+    }
+}
+```
