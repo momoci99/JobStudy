@@ -723,7 +723,302 @@ public class Main {
 텍스트 기반의 지뢰찾기(Minesweeper)게임을 설계하고 구현하라. 지뢰찾기는 NxN 격자판에 숨겨진 B개의 지뢰를 찾는 고전적인 컴퓨터 게임이다. 지뢰가 없는 셀(cell)에는 아무것도 적혀 있지 않거나 인접한 여덟 방향에 숨겨진 지뢰의 개수가 적혀 있다. 플레이어는 각 셀을 확인해 볼 수 있는데, 확인한 셀에 지뢰가 있다면 그 즉시 게임에서 진다. 확인한 셀에 숫자가 적혀 있다면 그 값이 공개된다. 해당 셀이 비어있다면 인접한 비어 있는 셀(숫자로 둘러싸인 셀을 만나기 전까지)모두 공개된다. 지뢰가 없는 모든 셀을 전부 공개된 상태로 바꿔 놓으면 플레이어가 이긴다. 지뢰가 있을 것 같은 위치에 깃발을 꽂아 표시해 둘 수 있는데, 깃발을 꽂는 것은 게임에 아무런 영향을 미치지 않는다. 실수로 잘못 클릭하는 상황을 방지하기 위한 기능일 뿐이다.
 
 
+```java
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Random;
+
+public class Main {
+
+    public class Cell{
+        private int row;
+        private int column;
+        private boolean isBomb;
+        private int number;
+        private boolean isExposed = false;
+        private boolean isGuess = false;
+
+
+        public Cell(int r, int c){
+            //...
+        }
+
+        public boolean flip(){
+            isExposed = true;
+            return !isBomb;
+        }
+
+        public boolean toggleGuess(){
+            if(!isExposed){
+                isGuess =! isGuess;
+            }
+            return isGuess;
+        }
+
+    }
+
+    public class Board {
+        private int nRows;
+        private int nColumns;
+        private int nBombs = 0;
+        private Cell[][] cells;
+        private Cell[] bombs;
+        private int numUnexposedRemaining;
+
+        public Board(int r, int c, int b){
+            //...
+        }
+
+        private void initializeBoard(){
+            //...
+        }
+
+        private boolean filpCell(Cell cell){
+            //...
+        }
+
+        public expandBlank(Cell cell){
+            //...
+        }
+        public UserPlayResult playFlip(UserPlay play){
+            //..
+        }
+        public int getNumRemaining(){
+            return numUnexposedRemaining;
+        }
+
+        void shuffleBoard(){
+            int nCells = nRows * nColumns;
+            Random random = new Random();
+            for(int index1 = 0; index1 < nCells; index1++){
+                int index2 = index1 + random.nextInt(nCells - index1);
+                if(index1 != index2){
+                    //index1의 셀을 갖고 온다.
+                    int row1 = index1 / nColumns;
+                    int column1 = (index1 - row1 * nColumns) % nColumns;
+                    Cell cell1 = cells[row1][column1];
+
+                    //index2의 셀을 갖고 온다.
+                    int row2 = index2 / nColumns;
+                    int column2 = (index2 - row2 * nColumns) % nColumns;
+                    Cell cell2 = cells[row2][column2];
+
+                    //셀을 바꾼다
+                    cells[row1][column1] = cell2;
+                    cell2.setRowAndColumn(row1, column1);
+                    cells[row2][column2] = cell1;
+                    cell1.setRowAndColumn(row2, column2);
+                }
+            }
+        }
+
+
+        //처음 지뢰를 셋팅
+        void setNumberedCells(){
+            int[][] deltas = {
+                    {-1,-1},{-1,0},{-1,1},
+                    {0,-1},        {0,1},
+                    {1,-1},{1,0},  {1,1}
+            };
+            for(Cell bomb : bombs){
+                int row = bomb.getRow();
+                int col = bomb.getColumnzlf();
+                for(int [] delta : deltas){
+                    int r = row + delta[0];
+                    int c = col + delta[1];
+                    if(inBounds(r, c)){
+                        cells[r][c].incrementNumber();
+                    }
+                }
+            }
+        }
+
+        //빈공간을 확장
+        void expandBlank(Cell cell){
+            int[][] deltas = {
+                    {-1,-1},{-1,0},{-1,1},
+                    {0,-1},        {0,1},
+                    {1,-1},{1,0},  {1,1}
+            };
+
+            Queue toExplore = new LinkedList();
+            toExplore.add(cell);
+
+            while(!toExplore.isEmpty()){
+                Cell current = toExplore.remove();
+                for(int[] delta : deltas){
+                    int r = current.getRow() + delta[0];
+                    int c = current.getColumn() + delta[1];
+                    if(inBounds(r,c)){
+                        Cell neighbor = cells[r][c];
+                        if(flipCell(neighbor) && neighbor.isBlank()){
+                            toExplore.add(neighbor);
+                        }
+                    }
+                }
+            }
+        }
+
+
+    }
+
+    public class UserPlay {
+        private int row;
+        private int column;
+        private boolean isGuess;
+
+
+
+    }
+    public class UserPlayResult{
+        private boolean successful;
+        private Game.GameState resultingState;
+    }
+
+
+    public class Game{
+        public enum GameState {WON, LOST, RUNNING}
+
+        private Board board;
+        private int rows;
+        private int columns;
+        private int bombs;
+        private GameState state;
+
+        public Game(int r, int c, int b){
+            //...
+        }
+
+        public boolean initialize(){
+            //...
+        }
+
+        public boolean start(){
+            //...
+        }
+
+        public boolean playGame(){
+            //...
+        }
+
+    }
+
+
+    public static void main(String[] args) {
+
+    }
+}
+
+
+```
+
 
 
 #### 7.12 해시테이블
 체인(chain 즉 연결리스트)을 사용해 충돌을 해결하는 해시테이블을 설계하고 구현하라.
+
+
+
+
+```java
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+public class Main {
+
+
+    public class Hasher<K,V>{
+
+        //node의 연결리스트 클래스, 해시테이블에서 사용한다.
+        //해시테이블 외에는 이 클래스에 접근할 수 없다. 양방향 연결리스트로 구현되어 있다.
+        private static class LinkedListNode<K,V>{
+            public LinkedListNode<K,V> next;
+            public LinkedListNode<K,V> prev;
+            public K key;
+            public V value;
+            public LinkedListNode(K k, V v){
+                key = k;
+                value = v;
+
+            }
+        }
+
+        private ArrayList<LinkedListNode<K,V>> arr;
+        public Hasher(int capacity){
+            //특정 크기만큼 연결리스트의 리스트를 만든다. 배열을 특정 크기만큼
+            //만들어 놓기 위해 리스트에 null 값을 채워 넣는다.
+
+            arr = new ArrayList<LinkedListNode<K,V>>();
+            arr.ensureCapacity(capacity);
+            for(int i = 0; i < capacity; i++){
+                arr.add(null);
+            }
+        }
+
+        //키와 값을 해시테이블에 삽입한다.
+        public void put(K key, V value){
+            LinkedListNode<K,V> node = getNodeForKey(key);
+            if(node != null){ //이미 존재하는 경우
+                node.value = value;
+                return;
+            }
+        }
+
+        node = new LinkedListNode<K,V>(key,value);
+        int index = getIndexForKey(key);
+        if(arr.get(index) != null){
+            node.next = arr.get(index);
+            node.next.prev = node;
+
+        }
+        arr.get(index, node);
+    }
+
+    //해당 키의 노드를 삭제한다
+    public void remove(K key){
+        Hasher.LinkedListNode<K, V> node = getNodeForKey(key);
+        if(node.prev != null){
+            node.prev.next = node.next;
+        } else{
+            //헤드를 삭제
+            int hashkey = getIndexForKey(key);
+            arr.set(hashkey, node.next);
+        }
+
+        if(node.next != null){
+            node.next.prev = node.prev;
+        }
+    }
+
+    //해당 키에 대한 값을 가져온다
+    public V get(K key){
+        Hasher.LinkedListNode<K, V> node = getNodeForKey(key);
+        return  node == null ? null : node.value;
+    }
+
+    //주어진 키와 연결된 연결리스트 노드를 가져온다.
+    private Hasher.LinkedListNode<K, V> getNodeForKey(K key){
+        int index = getIndexForKey(key);
+        Hasher.LinkedListNode<K,V> current = arr.get(index);
+        while(current != null){
+            if(current.key == key){
+                return current;
+            }
+            current = current.next;
+        }
+        return null;
+    }
+
+    //키를 인덱스에 대응하는 아주 끔찍한 함수
+    public int getIndexForKey(K key){
+        return Math.abs(key.hasCode() % arr.size());
+    }
+
+    //이 방법보다는 이진 탐색트리를 하위 자료구조로 사용하는것이 올바르다
+
+    public static void main(String[] args) {
+
+    }
+}
+
+```
