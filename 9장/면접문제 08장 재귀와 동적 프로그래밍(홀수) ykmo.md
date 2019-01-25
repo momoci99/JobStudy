@@ -393,6 +393,15 @@ ArrayList<String> getPerms(String remainder){
 n-쌍의 괄호로 만들 수 있는 모든 합당한(괄호가 적절히 열리고 닫힌)조합을 출력하는 알고리즘을 구현하라.
  
 
+풀이 : 문자열을 처음부터 만들어나가면 쉽다.
+
+- 왼쪽 괄호 : 왼쪽 괄호를 다 사용하지 않은 상태에서는 왼쪽 괄호는 항상 삽입 할 수 있다.
+- 오른쪽 괄호 : 문법 오류가 발생하지 않을 때만 넣을수 있다.
+- 왼쪽 괄호 수와 오른쪽 괄호 수를 추적.
+    - 왼쪽 괄호가 남아 있다면 왼쪽 괄호를 삽입하여 재귀 호출시행.
+    - 남은 오른쪽 괄호의 수 > 남은 왼쪽 괄호의 수 일때는 오른쪽 괄호를 삽입하고 재귀 호출 시행.
+
+
 ```cs 
 void addParen(ArrayList<String> list, int leftRem, int rightRem, char[] str, int index){
     if(leftRem < 0 || rightRem < leftRem) return; //잘못된 상태는 리턴
@@ -424,5 +433,179 @@ ArrayList<String> generatParens(int count){
 쿼터(25센트), 다임(10센트), 니켈(5센트), 페니(1센트)의 네 가지 동전이 무한히 주어졌을 때, n센트를 표현하는 모든 방법의 수를 계산하는 코드를 작성하라.
 
 
+
+풀이
+
+- n = 100일때 도합 100센트의 잔돈을 만드는 방법을 계산.
+
+- 100센트의 잔돈에는 쿼터가 0, 1, 2, 3, 4개가 있을 수 있다. 그러므로 아래와 같이 정리됨.
+
+
+makeChange(100) = makeChange(0개의 쿼터로 100을 만듦) + 
+                = makeChange(1개의 쿼터로 100을 만듦) + 
+                = makeChange(2개의 쿼터로 100을 만듦) + 
+                = makeChange(3개의 쿼터로 100을 만듦) + 
+                = makeChange(4개의 쿼터로 100을 만듦) + 
+
+여기서 문제의 크기를 줄일수 있음.
+
+그 예로 makeChange(1개의 쿼토로 100을 만듦)은 makeChange(0개의 쿼터로 75을 만듦)과 동일함.
+
+그 이유는 쿼터 하나를 사용해서 100센트를 만드는 방법과 75센트를 만드는 방법은 같기 떄문.
+
+
+```cs
+int makeChage(int amount, int[] denoms, int index){
+    if(index => denoms.length -1) {return 1;}
+    int denomAmount = denoms[index];
+    int ways = 0;
+    for (int i=0; i * denomAmount <= amount; i++){
+        int amountRemaining = amount - i * denomAmount;
+        ways += makeChange(amountRemaining, denoms, index + 1);
+    }
+    return ways;
+}
+
+int makeChange(int n){
+    int[] denoms = {25, 10, 5, 1};
+    return makeChange(n, denoms, 0);
+}
+
+```
+
+
+```cs
+//메모이제이션 적용
+int makeChange(int n){
+    int[] denoms = {25, 10, 5, 1};
+    int[][] map = new int[n + 1][denoms.length];
+    return makeChange(n, denoms, 0, map);
+}
+
+int makeChange(int amount, int[] denoms, int index, in[][] map){
+    if(map[amount][index] > 0){
+        return map[amount][index];
+    }
+    if(index >= denoms.length -1) {return 1;}
+    int denomAmount = denoms[index];
+    int ways = 0;
+    for(int i = 0; i * denomAmount <= amount; i++){
+        //다음 denom으로 진행한다. denomAmount짜리 동전 i개가 있다고 가정
+        int amountRemaining = amount - i * denomAmount;
+        ways += makeChange(amountRemaining, denoms, index + i, map);
+    }
+    map[amount][index] = ways;
+    return ways;
+}
+
+```
+
+
 #### 8.13 박스 쌓기 
 너비 w, 높이 h, 깊이 d, 인 박스n개가 있다. 상자는 회전시킬 수 없으며, 다른 상자 위에 올려 놓을 수 있다. 단, 아래 놓인 상자의 너비, 높이, 깊이가 위에 놓인 상자의 너비, 높이, 깊이보다 더 클때에만 가능하다. 이 상자들로 쌓을 수 있는 가장 높은 탑을 구하는 메서드를 작성하라. 탑의 높이는 탑을 구성하는 모든 상자의 높이 합니다.
+
+
+접근법 1)
+각각의 상자를 맨 밑에 두고 그 상태에서 쌓을 수 있는 가장 높은탑을 구하는것. 결국 가장 높은 탑을 구할 수 있게됨.
+
+```cs
+int createStack(ArrayList<Box> boxes){
+    //높이를 기준으로 내림차순으로 정렬하기
+    Collections.sort(boxes, new BoxComparator());
+    int maxHeight = 0;
+    for(int i = 0; i < boxes.size(); i++){
+        int height = createStack(boxes, i);
+        maxheight = Math.max(maxHeight, height);
+    }
+    return maxHeight;
+}
+
+int createStack(ArrayList<Box> boxes, int bottomIndex){
+    Box bottom = boxes.get(bottomIndex);
+    int maxHeight = 0;
+    for(int i = bottomIndex + 1; i < boxes.size(); i++){
+        if(boxes.get(i).canBeAbove(bottom)){
+            int height = createStack(boxes, i);
+            maxHeight = Math.max(height, maxHeight);
+        }
+    }
+    maxHeight += bottom.height;
+    return maxHeight;
+}
+
+class BoxComparator : Comparator<Box> {
+    
+    public int compare(Box x, Box y){
+        return y.height - x.height;
+    }
+}
+
+```
+
+```cs
+
+//메모이제이션 적용
+
+int createStack(ArrayList<Box> boxes){
+    Collections.sort(boxes, new BoxComparator());
+    int maxHeight = 0;
+    int[] stackMap = new int[boxes.size()];
+    for(int i = 0; i < boxes.size(); i++){
+        int height = createStack(boxes, i, stackMap);
+        maxHeight = Math.max(maxHeight, height);
+    }
+    return maxHeight;
+}
+
+int createStack(ArrayList<Box> boxes, int bottomIndex, int[] stackMap){
+    if(bottomIndex < boxes.size() && stackMap[bottomIndex] > 0){
+        return stackMap[bottomIndex];
+    }
+
+    Box bottom = boxes.get(bottomIndex);
+    int maxHeight = 0;
+    for (int i = bottomIndex + 1; i< boxes.size(); i++){
+        if(boxes.get(i).canBeAbove(bottom)){
+            int height = createStack(boxes, i, stackMap);
+            maxHeight = Math.max(height, maxHeight);
+        }
+    }
+    maxHeight += bottom.height;
+    stackMap[bottomIndex] = maxHeight;
+    return maxHeight;
+
+}
+
+```
+
+
+
+해법 2
+
+```cs
+int createStack(ArrayList<Box> boxes){
+    Collections.sort(boxes, new BoxComparator());
+    int[] stackMap = new int[boxes.size()];
+    return createStack(boxes, null, 0, stackMap);
+}
+
+int createStack(ArrayList<Box> boxes, Box bottom, int offset, int[] stackMap){
+    if (offset >= boxes.size()) return 0;
+
+    //현재 상자가 바닥일 때의 높이
+    Box newBottom = boxes.get(offset);
+    int heightWithBottom = 0;
+    if (bottom == null || newBottom.canBeAbove(bottom)){
+        if (stackMap[offset] == 0){
+            stackMap[offset] = createStack(boxes, newBottom, offset + 1, stackMap);
+            stackMap[offset] += newBottom.height;
+        }
+        heightWithBottom = stackMap[offset];
+    }
+
+    //바닥이 아닐 때
+    int heightWithoutBottom = createStack(boxes, bottom, offset + 1, stackMap);
+
+    //둘중 더 나은것을 반환
+    return Math.max(heightWithBottom, heightWithoutBottom)
+}
