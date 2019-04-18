@@ -118,9 +118,85 @@ String sortChars(String s){
 
 배열과 비슷하지만 size 메서드가 없는 Listy라는 자료구조가 있다. 여기에는 i 인덱스에 위치한 원소를 O(1) 시간에 알 수 있는 elementAt(i) 메서드가 존재한다. 만약 i가 배열의 범위를 넘어섰다면 -1을 반환한다(이 때문에 이 자료구조는 양의 정수만 지원한다). 양의 정수가 정렬된 Listy가 주어졌을 때, 원소 x의 인덱스를 찾는 알고리즘을 작성하라. 만약 x가 여러 번 등장한다면 아무거나 하나만 반환하면 된다.
 
+
+풀이 
+
+> elementAt을 이용한 리스트의 길이 추측
+
+- i가 너무 크면 elementAt가 -1을 반환하는것을 이용.
+- 리스트를 벗어날때 까지 값을 점점 크게해봄.
+- 리스트는 정렬되어있음을 이용하여 1, 2, 4, 8, 16 과 같이 늘려봄
+- 리스트의 길이가 n 일때 (O log n) 시간 안에 길이를 구할 수 있음.
+
+    왜 O(long n)인가?
+
+    q=1에서 시작한다고 가정.
+
+    q가 n보다 커질 때 까지 q는 두 배씩 증가함. 
+
+    2^k = n 이되는 k값은 무엇인가? 
+    
+    log의 정의에 따라 k = log(n)과 같음.
+
+
+- 길이를 찾았다면 이진탐색과 비슷하게 수행.
+- 단, 중간 지점이 -1이라면 왼쪽만 탐색함.
+
+
+```java
+int search(Listy list, int vlaue) {
+    int index = 1;
+    while (list.elementAt(index) != -1 && list.elementAt(index) < value){
+        index *=2;
+    }
+    return binarySearch(list, value, index / 2, index);
+}
+
+
+
+int binarySearch(Listy list, int value, int low, int high){
+    int mid;
+
+    while (low <= mid){
+        mid = (low + high) / 2;
+        int middle = list.elementAt(mid);
+        
+        //중간값이 현재 value 값보다 크거나
+        //-1이라면 왼쪽을 탐색하게 한다.
+        if (middle > value || middle == -1){
+            high = mid - 1;
+        } else if(middle < value){
+            low = mid + 1;
+        } else {
+            return mid;
+        }
+    }
+    return -1;
+}
+
+
+```
+
+    
+
+
 ## 10.6 큰 파일 정렬
 
 한 줄에 문자열 하나가 쓰여있는 20GB짜리 파일이 있다고 하자. 이 파일을 정렬하려면 어떻게 해야 할지 설명하라.
+
+> 모든 데이터를 메모리에 올려둘 수 없다는뜻.
+
+- 가용가능한 메모리만큼 파일을 적재.
+- 각 파일을 개별적으로 정렬.
+- 정렬후 하나씩 병합.
+- 모든 파일의 병합이 끝나면 완벽히 정렬된 파일을 얻음
+
+> 외부정렬이라고 부름
+
+
+
+
+
 
 ## 10.8 중복 찾기
 
