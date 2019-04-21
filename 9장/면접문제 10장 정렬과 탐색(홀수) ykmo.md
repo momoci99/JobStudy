@@ -202,6 +202,51 @@ int binarySearch(Listy list, int value, int low, int high){
 
 1부터 N(<=32,000)까지의 숫자로 이루어진 배열이 있다. 배열엔 중복된 숫자가 나타날 수 있고, N이 무엇인지는 알 수 없다. 사용 가능한 메모리가 4KB일 때, 중복된 원소를 모두 출력하려면 어떻게 할 수 있을까?
 
+- 4KB -> 4 * 1024(2^10) * 8 비트의 주소 공간을 사용가능.
+- 32*2^10 비트는 32,000보다 큼.
+- 따라서 32,000비트로 구성된 비트 벡터를 구성
+- 비트 벡터가 하나의 정수를 나타내도록 함.
+- 비트 벡터를 순회하면서 각 원소 v에 상응하는 비트 벡터의 비트를 1로 만듬.
+- 쉽게말하자면 찾으려는 원소에 마킹하는것.
+
+```java
+void checkDuplicates(int[] array){
+    BitSet bs = new BitSet(32000);
+    for(int i = 0; i<array.length; i++){
+        int num = array[i];
+        int num0 = num - 1; // bitset은 0에서 시작, 숫자는 1에서 시작.
+        if(bs.get(num0))    {
+            System.out.println(num);
+        } else {
+            bs.set(num0);
+        }        
+    }
+}
+
+class BitSet {
+    int[] bitset;
+
+    public BitSet(int size){
+        bitset = new int[(size >> 5) + 1]; //32로 나눈다.
+    }
+
+    boolean get(int pos){
+        int wordNumber = (pos >> 5); //32로 나눈다.
+        int bitNumber = (pos & 0x1F); //32로 나눈 나머지
+        return (bitset[wordNumber] & (1<<bitNumber)) !=0;
+    }
+
+    void set(int pos){
+        int wordNumber = (pos >> 5); //32로 나눈다.
+        int bitNumber = (pos & 0x1F); //32로 나눈 나머지
+        bitset[wordNumber] |= 1 << bitNumber;
+    }
+}
+
+```
+
+
+
 ## 10.10 스트림에서의 순위
 
 정수 스트림을 읽는다고 하자. 주기적으로 어떤 수의 x의 랭킹(x보다 같거나 작은 수의 개수)을 확인하고 싶다. 해당 연산을 지원하는 자료구조와 알고리즘을 구현하라. 수 하나를 읽을 때 마다 호출되는 메서드 tracker(int x)와, x보다 같거나 작은 수의 개수(x 자신은 제외)를 반환하는 메서드 getRankOfNumber(int x)를 구현하면 된다.
