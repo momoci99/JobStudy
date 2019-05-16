@@ -127,6 +127,100 @@ int b2 = bar2->val;//35
 자바의 객체 리플렉션(object reflection)을 설명하고, 이것이 유용한 이유를 나열하라.
 
 
+> 자바 클래스와 객체에 대한 정보를 프로그램 내에서 동적으로 알아 낼 수 있도록하는 기능.
+
+
+- 프로그램 실행 시간(runtime)에 클래스 내부의 메서드와 필드에 대한 정보를 얻을 수 있음.
+
+- 클래스의 객체를 생성할 수 있다.
+
+- 접근제어자(private)에 관계없이 해당 필드에 대한 참조를 얻어내어 값을 가져오가나 설정할 수 있다.
+
+
+예
+
+```java
+/* 인자(parameters) */
+Object[] doubleArgs = new Object[] {4.2, 3.9};
+
+/* 클래스 가져오기 */
+Class rectangleDefinition = Class.forName("MyProj.Rectangle");
+
+/* Rectangle rectangle = Rectangle(4.2, 3.9); 와 같다 */
+Class[] doubleArgsClass = new Class[] {double.class, double.class};
+Constructor doubleArgsConstructor = retangleDefinition.getConstructor(doubleArgsClass);
+
+
+Rectangle rectangle = (Rectangle) doubleArgsConstructor.newInstance(doubleArgs);
+
+/*Double area = rectangle.area(); 와같다*/
+Method m = rectangleDefinition.getDeclaredMethod("area");
+Double area = (Double) m.invoke(rectangle);
+
+
+```
+위의 코드는 아래와 같다.
+
+```java
+Rectangle rectangle = new Rectangle(4.2, 3.9);
+Double area = rectangle.area();
+```
+
+- 객체 리플렉션은 아래와 같은 이점이 있다.
+    - 프로그램이 어떻게 동작하는지 *실행시간* 에 관측하고 조정할 수 있도록 해준다.
+    - 메서드나 생성자, 필드에 직접 접근하므로 디버깅이나 테스트할때 유용함.
+    - 호출할 메서드를 몰라도 이름을 사용하여 호출할 수 있음
+        - 메서드 이름을 주면 해당정보를 사용하여 객체를 생성하고 메서드를 호출 할 수 있음.
+        - 이 과정을 리플렉션 없이 시도하면 if문을 매우 복잡하게 사용해야함.
+
+
 
 ## 8. 람다 랜덤
 람다(lamda) 표현식을 사용해서 임의의 부분집합을 반환하는 함수 List getRandomSubset(List<Integer> list)를 작성하라. 공집합을 포함한 모든 부분집합이 선택될 확률은 같아야 한다.
+
+
+```Java
+//람다 표현식을 안쓴 코드
+List<Integer> getRandomSubset(List<Integer> list){
+    List<Integer> subset = new ArrayList<Integer>();
+    Random random = new Random();
+    for (int item : list){
+        /* 동전 던지기 */
+        if(random.nextBoolean()){
+            subset.add(item);
+        }
+    }
+    return subset;
+}
+
+
+```Java
+//람다 표현식 사용
+List<Integer> getRandomSubset(List<Integer> list){
+    Random random = new Random();
+    List<Integer> subset = list.stream().filter(
+        k->{return random.newxtBoolean();/*동전 던지기*/
+        }).collect(Collectors.toList());
+    return subset;
+}
+
+```
+
+
+```Java
+//함수 내부에 정의된 Predicate 사용
+Random random = new Random();
+Predicate<Object> flipCoin = o -> {
+    return random.nextBoolean();
+};
+
+List<Integer> getRandomSubset(List<Integer> list){
+    List<Integer> subset = list.stream().filter(flipCoin).collect(Collectors.toList());
+
+    return subset;
+}
+
+
+
+```
+
